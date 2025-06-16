@@ -1,0 +1,64 @@
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Modern Wooden Chair",
+      "category": "Furniture",
+      "price": 120.00,
+      "discountPrice": 100.00,
+      "description": "Elegant wooden chair crafted with premium oak wood. Perfect for living or office spaces.",
+      "rating": 4.5,
+      "reviews": 89,
+      "image": "assets/images/products/chair-1.jpeg",
+      "gallery": [
+        "assets/images/products/chair-1.jpeg",
+        "assets/images/products/chair-2.jpeg",
+        "assets/images/products/chair-3.jpeg",
+        "assets/images/products/chair-4.jpeg",
+        "assets/images/products/chai-4.jpeg"
+      ],
+      "availableColors": ["#A0522D", "#D2B48C", "#000000"],
+      "availableSizes": ["Small", "Medium", "Large"],
+      "stock": 23,
+      "isFavourite": true
+    },
+    {
+      "id": 2,
+      "name": "Glass Coffee Table",
+      "category": "Furniture",
+      "price": 200.00,
+      "discountPrice": 180.00,
+      "description": "Stylish glass-top coffee table with sturdy metal legs.",
+      "rating": 4.0,
+      "reviews": 67,
+      "image": "assets/images/products/table-1.jpeg",
+      "gallery": [
+        "assets/images/products/table-1.jpeg",
+        "assets/images/products/table-2.jpeg"
+      ],
+      "availableColors": ["#FFFFFF", "#808080"],
+      "availableSizes": ["Standard"],
+      "stock": 12,
+      "isFavourite": false
+    },
+    {
+      "id": 3,
+      "name": "Running Shoes",
+      "category": "Footwear",
+      "price": 150.00,
+      "discountPrice": 120.00,
+      "description": "High-performance running shoes for daily wear or workouts.",
+      "rating": 4.8,
+      "reviews": 230,
+      "image": "assets/images/products/shoe-1.jpg",
+      "gallery": [
+        "assets/images/products/shoe-1.jpg",
+        "assets/images/products/shoe-2.jpg"
+      ],
+      "availableColors": ["#FF0000", "#000000", "#1E90FF"],
+      "availableSizes": ["7", "8", "9", "10"],
+      "stock": 40,
+      "isFavourite": true
+    }
+  ]
+}

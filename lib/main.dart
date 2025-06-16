@@ -1,30 +1,25 @@
-import 'package:ecommerce/Homepage/Homepage.dart';
+import 'package:ecommerce/app/app.dart';
+import 'package:ecommerce/product/bloc/product_bloc.dart';
+import 'package:ecommerce/product/repo/prouductrepository.dart';
 import 'package:flutter/material.dart';
-import 'package:responsive_framework/responsive_framework.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const home());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class home extends StatelessWidget {
+  const home({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      builder:
-          (context, child) => ResponsiveBreakpoints.builder(
-            child: child!,
-            breakpoints: [
-              const Breakpoint(start: 375, end: 450, name: MOBILE),
-              const Breakpoint(start: 451, end: 800, name: TABLET),
-              const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-              const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-            ],
-          ),
-      debugShowCheckedModeBanner: false,
-      darkTheme: ThemeData.dark(),
-      home: Homepage(),
+    return BlocProvider(
+      create: (context) => ProductBloc(ProductRepository())..add(ProductInitialEvent()),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(primarySwatch: Colors.brown),
+        home: const App(),
+      ),
     );
   }
 }

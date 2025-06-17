@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class ProductsMobileview extends StatefulWidget {
   const ProductsMobileview({super.key});
@@ -25,9 +26,8 @@ class _ProductsMobileviewState extends State<ProductsMobileview> {
         if (productState.status == productstatus.loading) {
           return const Center(child: CircularProgressIndicator());
         } else if (productState.status == productstatus.success) {
-          final products = productState.productlist ?? [];
-
-          if (products.isEmpty) {
+          final products = productState.productlist;
+          if (products == null || products.isEmpty) {
             return const Center(
               child: Text('No products available', style: TextStyle(fontSize: 18, color: Colors.grey)),
             );
@@ -36,6 +36,8 @@ class _ProductsMobileviewState extends State<ProductsMobileview> {
           return Padding(
             padding: const EdgeInsets.all(8.0),
             child: GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: 0.6,
@@ -88,15 +90,10 @@ class _ProductsMobileviewState extends State<ProductsMobileview> {
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: SizedBox(
-                height: double.infinity,
-                width: double.infinity,
-                child: _buildProductImage(product.image),
-              ),
+              child: SizedBox(height: double.infinity, width: double.infinity, child: _buildProductImage(product)),
             ),
           ),
 
-          // Favourite Button
           Positioned(
             top: 8,
             right: 8,
@@ -222,53 +219,66 @@ class _ProductsMobileviewState extends State<ProductsMobileview> {
     );
   }
 
-  Widget _buildProductImage(String? imageUrl) {
-    // Handle null or empty image URL
+  Widget _buildProductImage(ProductModel product) {
+    // Get the primary image URL
+    String? imageUrl = _getPrimaryImageUrl(product);
+
+    // If no valid image URL found, show placeholder
     if (imageUrl == null || imageUrl.isEmpty) {
       return _buildPlaceholderImage();
     }
 
-    if (imageUrl.startsWith('assets/images/products/')) {
+    // Check if it's a network URL
+    if (_isNetworkUrl(imageUrl)) {
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
+        fit: BoxFit.cover,
+        key: ValueKey(imageUrl), // Add key to prevent random regeneration
+        placeholder:
+            (context, url) =>
+                Container(color: Colors.grey[100], child: const Center(child: CircularProgressIndicator())),
+        errorWidget: (context, url, error) {
+          log.w('Failed to load network image: $imageUrl, Error: $error');
+          return _buildPlaceholderImage();
+        },
+        memCacheWidth: 400, // Optimize memory usage
+        memCacheHeight: 400,
+      );
+    } else {
+      // Handle asset images
       return Image.asset(
         imageUrl,
         fit: BoxFit.cover,
+        key: ValueKey(imageUrl), // Add key to prevent random regeneration
         errorBuilder: (context, error, stackTrace) {
-          log.e('Asset image error: $error');
+          log.w('Failed to load asset image: $imageUrl');
           return _buildPlaceholderImage();
         },
       );
     }
+  }
 
-    // Check if it's a valid network URL
-    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-      return Image.network(
-        imageUrl,
-        fit: BoxFit.cover,
-        headers: const {'User-Agent': 'Mozilla/5.0 (compatible; Flutter app)'},
-        errorBuilder: (context, error, stackTrace) {
-          log.e('Network image error: $error');
-          return _buildPlaceholderImage();
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) return child;
-          return Container(
-            color: Colors.grey[100],
-            child: Center(
-              child: CircularProgressIndicator(
-                value:
-                    loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                        : null,
-              ),
-            ),
-          );
-        },
-      );
+  String? _getPrimaryImageUrl(ProductModel product) {
+    // Priority order: gallery first, then image array
+    if (product.gallery.isNotEmpty) {
+      String galleryImage = product.gallery[0];
+      if (galleryImage.isNotEmpty) {
+        return galleryImage;
+      }
     }
 
-    // If image URL doesn't match expected patterns, show placeholder
-    log.w('Invalid image URL format: $imageUrl');
-    return _buildPlaceholderImage();
+    if (product.image.isNotEmpty) {
+      String imageUrl = product.image[0];
+      if (imageUrl.isNotEmpty) {
+        return imageUrl;
+      }
+    }
+
+    return null;
+  }
+
+  bool _isNetworkUrl(String url) {
+    return url.startsWith('http://') || url.startsWith('https://');
   }
 
   Widget _buildPlaceholderImage() {

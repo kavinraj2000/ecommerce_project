@@ -15,11 +15,7 @@ class home extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ProductBloc(ProductRepository())..add(ProductInitialEvent()),
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(primarySwatch: Colors.brown),
-        home: const App(),
-      ),
+      child: MaterialApp(debugShowCheckedModeBanner: false, home: const App()),
     );
   }
 }
